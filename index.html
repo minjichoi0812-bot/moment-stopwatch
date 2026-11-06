@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f5ef">
+  <meta name="description" content="시간을 간편하게 측정하고 랩 기록을 남기는 스탑워치">
+  <title>MOMENT | 스탑워치</title>
+  <link rel="stylesheet" href="./style.css">
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <svg id="water-filter-svg" class="water-filter-svg" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+    <filter id="water-distortion" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.006 0.014" numOctaves="1" seed="4" result="water-noise">
+        <animate attributeName="baseFrequency" dur="24s" values="0.006 0.014;0.0075 0.012;0.006 0.014" repeatCount="indefinite"></animate>
+      </feTurbulence>
+      <feDisplacementMap in="SourceGraphic" in2="water-noise" scale="10" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
+    </filter>
+  </svg>
+  <div class="art-background" aria-hidden="true"></div>
+  <div class="water-flow" aria-hidden="true"></div>
+  <div class="water-effect" aria-hidden="true"><span></span><span></span><span></span></div>
+  <div class="water-sparkles" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="page-shell">
+    <header class="topbar">
+      <a class="brand" href="./" aria-label="MOMENT 스탑워치 홈">
+        <span class="brand-mark" aria-hidden="true"><span></span></span>
+        <span>moment<span class="brand-period">.</span></span>
+      </a>
+      <div class="topbar-right"><span class="topbar-dot"></span> A LITTLE TIME FOR YOU</div>
+    </header>
+
+    <main>
+      <div class="heading-row">
+        <div>
+          <p class="eyebrow"><span></span> TIME, AT YOUR PACE</p>
+          <h1>스탑워치</h1>
+          <p class="intro">당신의 소중한 시간을 기록해 보세요.</p>
+        </div>
+        <a class="heading-ornament artwork-credit" href="https://www.metmuseum.org/art/collection/search/437137" target="_blank" rel="noopener noreferrer" aria-label="배경 작품: 클로드 모네, 수련, 1916년부터 1919년. 메트로폴리탄 미술관에서 보기"><span>CLAUDE MONET</span><span>WATER LILIES, 1916–19 <b>↗</b></span></a>
+      </div>
+
+      <div class="workspace">
+        <section class="timer-card" aria-label="스탑워치">
+          <div class="card-topline">
+            <div class="section-title"><span class="section-index">01</span><span>시간 측정</span></div>
+            <div class="timer-tools">
+              <button id="outdoor-toggle" class="outdoor-toggle" type="button" aria-pressed="false" aria-label="야외 고대비 모드 켜기">☀ <span>야외 모드</span></button>
+              <div id="status" class="status" aria-live="polite"><span class="status-dot"></span><span id="status-text">측정 준비</span></div>
+            </div>
+          </div>
+
+          <div class="dial-wrap">
+            <div class="dial">
+              <svg class="dial-svg" viewBox="0 0 400 400" aria-hidden="true">
+                <circle class="dial-track" cx="200" cy="200" r="187"></circle>
+                <circle id="progress" class="dial-progress" cx="200" cy="200" r="187" pathLength="100"></circle>
+              </svg>
+              <div class="dial-inner">
+                <div class="dial-caption"><span></span> ELAPSED TIME</div>
+                <div class="time-display" aria-hidden="true"><span id="hours">00</span><span class="separator">:</span><span id="minutes">00</span><span class="separator">:</span><span id="seconds">00</span><span class="fraction">.<span id="centiseconds">00</span></span></div>
+                <p class="time-unit">시 <span> / </span> 분 <span> / </span> 초 <span> / </span> 1/100초</p>
+                <output id="accessible-time" class="sr-only" aria-label="현재 경과 시간" aria-live="off">00:00:00.00</output>
+              </div>
+              <span class="dial-start-dot" aria-hidden="true"></span>
+            </div>
+          </div>
+
+          <div class="current-lap"><span id="current-lap-label">현재 구간</span><strong id="current-lap-time">00:00:00.00</strong></div>
+          <div class="controls controls-primary" role="group" aria-label="시간 측정 제어">
+            <button id="toggle-button" class="control-btn primary" type="button">
+              <svg id="toggle-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8.5 5.5v13l10-6.5-10-6.5Z" fill="currentColor"/></svg>
+              <span id="toggle-label">시작하기</span>
+            </button>
+            <button id="lap-button" class="control-btn lap-action" type="button" disabled>
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 20V4m0 1h11l-2.5 3L16 11H5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span>랩 추가</span>
+            </button>
+          </div>
+          <div class="controls controls-utility" role="group" aria-label="기록 마무리 및 초기화">
+            <button id="finish-button" class="control-btn secondary" type="button" disabled>완주 기록</button>
+            <button id="reset-button" class="control-btn secondary" type="button" disabled>기록 초기화</button>
+          </div>
+          <p id="control-hint" class="control-hint">시작 후 랩을 추가할 수 있어요.</p>
+          <p id="storage-notice" class="storage-notice" role="status" hidden></p>
+          <div class="timer-bottom"><span>TAKE YOUR TIME</span><span>EVERY SECOND MATTERS <b>✳</b></span></div>
+        </section>
+
+        <section class="laps-card" aria-labelledby="laps-heading">
+          <div class="card-topline laps-topline">
+            <div class="section-title"><span class="section-index">02</span><h2 id="laps-heading">랩 기록</h2></div>
+            <div class="lap-count"><span id="lap-count">0</span> LAPS</div>
+          </div>
+          <div class="laps-description">구간별 기록과 누적 시간을 확인하세요. <span>0.01초 단위 · 수동 측정</span></div>
+          <div class="list-header"><span>기록</span><span>구간 시간</span><span>누적 시간</span></div>
+          <div id="empty-state" class="empty-state">
+            <div class="empty-icon" aria-hidden="true"><span></span><span></span><span></span></div>
+            <strong>아직 기록이 없어요</strong>
+            <p>측정을 시작하고 랩을 추가해 보세요.</p>
+          </div>
+          <ol id="laps-list" class="laps-list" aria-label="랩 기록 목록"></ol>
+          <div class="lap-footer"><span>YOUR MOMENTS</span><span id="lap-footer-text">기록을 기다리는 중</span></div>
+        </section>
+      </div>
+      <div class="below-workspace"><span>MADE FOR YOUR MOMENTS <b>✳</b></span><span>한 번에 한 순간씩.</span></div>
+    </main>
+    <footer><span>© MOMENT</span><span>FOCUS ON WHAT MATTERS.</span></footer>
+  </div>
+  <div id="announcement" class="sr-only" role="status" aria-live="polite"></div>
+</body>
+</html>
